@@ -11,7 +11,12 @@ jobs:
    
     runs-on: ubuntu-latest 
     steps:
-      - uses: actions/checkout@v4
+      - name: checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+      
       - name: Build image
         run: | 
               docker build -t ${{secrets.REGISTRY_USER}}/portfolio:${{github.run_number}} .
