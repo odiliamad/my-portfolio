@@ -57,8 +57,8 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}  
-          cache-from: type=sha
-          cache-to: type=sha,mode=max
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           
       - name: delete all untaged versions
         uses: actions/delete-package-versions@v5
