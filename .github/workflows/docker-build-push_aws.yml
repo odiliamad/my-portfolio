@@ -60,7 +60,7 @@ jobs:
       - name: delete all untaged versions
         uses: actions/delete-package-versions@v5
         with: 
-           package-name: 'test-package-${{github.head_ref || github.ref_name }}'
+           package-name: 'my-portfolio-${{github.head_ref || github.ref_name }}'
            package-type: 'container'
            min-versions-to-keep: 3
            delete-only-untagged-versions: 'true' 
