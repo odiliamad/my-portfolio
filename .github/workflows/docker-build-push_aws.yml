@@ -5,8 +5,8 @@ on:
   pull_request:
     branches: [ "main" ]
 env:
-  REGISTRY: ghcr.io
-  #REGISTRY: <aws-account-number>.dkr.ecr.<region>.amazonaws.com
+  #REGISTRY: ghcr.io
+  REGISTRY: ${{ secrets.REPO_URI }}
   #account/repo
   IMAGE_NAME: ${{ github.repository }}-${{ github.head_ref || github.ref_name }}
 
@@ -42,12 +42,11 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v3  
         with:
-          registry: ${{env.REGISTRY}} 
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          
-          #username: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          #password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          #registry: ${{env.REGISTRY}} 
+          #password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ${{ secrets.REPO_URI }}
+          username: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           
       - name: Build and push docker image to the container registry
         uses: docker/build-push-action@v6
