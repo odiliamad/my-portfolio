@@ -1,0 +1,64 @@
+name: Docker-AWS
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}  # Use secret for AWS Region
+  ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+  IMAGE_NAME: ${{ github.repository }}-${{ github.head_ref || github.ref_name }}
+
+jobs:
+  
+  build:
+    runs-on: ubuntu-latest 
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Create .env for file build
+        run: echo "$ENV_TEXT" > .env 
+        env:
+          ENV_TEXT: ${{ vars.ENV_TEXT }}
+       
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          registry: ${{ env.ECR_REGISTRY }}
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.ECR_REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: latest  
+          
+      - name: Build and push Docker image to Amazon ECR
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}  
+          cache-from: type=sha
+          cache-to: type=sha,mode=max
+
+      - name: Delete all untagged versions
+        uses: actions/delete-package-versions@v5
+        with: 
+          package-name: 'my-portfolio-${{ github.head_ref || github.ref_name }}'
+          package-type: 'container'
+          min-versions-to-keep: 3
+          delete-only-untagged-versions: 'true'
