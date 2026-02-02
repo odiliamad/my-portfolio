@@ -1,7 +1,7 @@
 name: Docker-AWS
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main1 ]
   pull_request:
     branches: [ "main" ]
 env:
