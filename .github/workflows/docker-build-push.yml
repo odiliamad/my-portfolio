@@ -9,7 +9,7 @@ env:
   #REGISTRY: <aws-account-number>.dkr.ecr.<region>.amazonaws.com
   #account/repo
   IMAGE_NAME: ${{ github.repository }}-${{ github.head_ref || github.ref_name }}
-
+  
 jobs:
   build:
     runs-on: ubuntu-latest 
