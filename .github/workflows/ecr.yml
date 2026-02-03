@@ -52,7 +52,7 @@ jobs:
           context: .                           
           file: Dockerfile                     
           push: true                          
-          tags: ${{ steps.login-ecr.outputs.registry }}/${{ env.IMAGE_NAME }}:${{ github.sha }}  # Set the image tag.
+          tags: ${{ github.sha }}
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}  # ECR registry URL, defined from previous step.
           IMAGE_TAG: ${{ github.sha }}                            # Image tag using the Git commit SHA.
