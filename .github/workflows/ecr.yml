@@ -10,9 +10,8 @@ on:
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}  # Use secret for AWS Region
   ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-  IMAGE_TAG: ${{ github.head_ref || github.ref_name }}
-  REPOSITORY: portfolioapp
-  
+  IMAGE_NAME: ${{ github.repository }}-${{ github.head_ref || github.ref_name }}
+
 jobs:
   
   build:
@@ -55,15 +54,15 @@ jobs:
         run: |
           docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
-
+          
       - name: Set output for image
-        id: image-name
-        run: echo "image=${{ steps.login-ecr.outputs.registry }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}" >> $GITHUB_OUTPUT
+        id : image-name
+        run: echo "image=${{ steps.login-ecr.outputs.registry }}/$REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
       - name: Delete all untagged versions
         uses: actions/delete-package-versions@v5
         with: 
-          package-name: '${{ steps.image-name.outputs.run }}'
+          package-name: '${{ steps.image-name.outputs.package }}'
           package-type: 'container'
           min-versions-to-keep: 3
           delete-only-untagged-versions: 'true'
