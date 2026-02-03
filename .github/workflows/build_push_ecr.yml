@@ -1,4 +1,4 @@
-name: Docker-AWS
+name: Docker-build-push-ECR
 on:
   push:
     branches: [ "main1" ]
