@@ -50,7 +50,7 @@ jobs:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: portfolioapp
           #IMAGE_TAG: ${{ github.sha }}
-          IMAGE_TAG: latest
+          IMAGE_TAG: ${{ github.head_ref || github.ref_name }}
         run: |
           docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
