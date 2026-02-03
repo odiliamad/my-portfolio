@@ -3,7 +3,7 @@ name: Docker-GHCR
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main1" ]
   pull_request:
     branches: [ "main" ]
 env:
