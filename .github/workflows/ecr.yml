@@ -57,12 +57,13 @@ jobs:
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
       - name: Set output for image
+        id: image-name
         run: echo "image=${{ steps.login-ecr.outputs.registry }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}" >> $GITHUB_OUTPUT
 
       - name: Delete all untagged versions
         uses: actions/delete-package-versions@v5
         with: 
-          package-name: 'my-portfolio-${{ github.head_ref || github.ref_name }}'
+          package-name: '${{ steps.image-name.outputs.run }}'
           package-type: 'container'
           min-versions-to-keep: 3
           delete-only-untagged-versions: 'true'
