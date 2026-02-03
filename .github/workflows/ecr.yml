@@ -1,7 +1,9 @@
+
 name: Docker-AWS
+
 on:
   push:
-    branches: [ "main1" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
@@ -20,7 +22,8 @@ jobs:
       id-token: write
       
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
       
       - name: Create .env for file build
         run: echo "$ENV_TEXT" > .env 
@@ -34,30 +37,28 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-         role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-         aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-  
       - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
-        #with:
-        # aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-         # aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        #  registry: ${{ env.ECR_REGISTRY }}
-      
-      - name: Build and push Docker image to Amazon ECR
+        
+
+      - name: Build, tag, and push image to Amazon ECR
         uses: docker/build-push-action@v6
+        id: build-image
         with:
-          context: .
-          file: Dockerfile
-          push: true
-          tags: ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:${{ github.sha } 
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-       env:
-      ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}  # ECR registry URL, defined from previous step.
-       IMAGE_TAG: ${{ github.sha }
+          context: .                           
+          file: Dockerfile                     
+          push: true                          
+          tags: ${{ steps.login-ecr.outputs.registry }}/${{ env.IMAGE_NAME }}:${{ github.sha }}  # Set the image tag.
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}  # ECR registry URL, defined from previous step.
+          IMAGE_TAG: ${{ github.sha }}                            # Image tag using the Git commit SHA.
+
+      - name: Set output for image
+        run: echo "image=${{ steps.login-ecr.outputs.registry }}/${{ env.IMAGE_NAME }}:${{ github.sha }}" >> $GITHUB_OUTPUT
 
       - name: Delete all untagged versions
         uses: actions/delete-package-versions@v5
