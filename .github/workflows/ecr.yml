@@ -62,7 +62,7 @@ jobs:
       - name: Delete all untagged versions
         uses: actions/delete-package-versions@v5
         with: 
-          package-name: '${{ steps.image-name.outputs.package }}'
+          #package-name: '${{ steps.image-name.outputs.package }}'
           package-type: 'container'
           min-versions-to-keep: 3
           delete-only-untagged-versions: 'true'
